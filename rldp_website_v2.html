@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RLDP — Regularized Latent Dynamics Prediction</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --panel: #ffffff;
+      --soft: #f3f4f6;
+      --line: #e6e8eb;
+      --text: #171717;
+      --muted: #666;
+      --accent: #2f5cff;
+      --maxw: 1040px;
+      --shadow: 0 12px 32px rgba(0,0,0,0.06);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      width: min(var(--maxw), calc(100vw - 36px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 34px 0 22px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 auto 18px;
+      max-width: 980px;
+      font-size: clamp(2.3rem, 5vw, 3.65rem);
+      line-height: 1.08;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+    }
+
+    .authors {
+      max-width: 920px;
+      margin: 0 auto 8px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 18px;
+      font-size: 1.05rem;
+      align-items: center;
+      justify-items: center;
+    }
+
+    .author-item a {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .author-item a:hover {
+      text-decoration: underline;
+    }
+
+    .contrib-note {
+      margin: 2px auto 10px;
+      max-width: 920px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      text-align: center;
+    }
+
+    .meta {
+      max-width: 920px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 1rem;
+      text-align: center;
+      line-height: 1.55;
+    }
+
+    .meta-affiliations {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: nowrap;
+    }
+
+    .hero-media {
+      margin: 28px auto 14px;
+      background: linear-gradient(180deg, #fbfbfb, #f2f3f6);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      min-height: 430px;
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-media .placeholder {
+      color: #8a8f98;
+      font-size: 1rem;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .paper-links {
+      margin-top: 14px;
+      font-size: 1.02rem;
+    }
+
+    .note {
+      margin: 18px auto 0;
+      max-width: 860px;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .divider {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 34px auto 28px;
+      width: min(var(--maxw), calc(100vw - 36px));
+    }
+
+    section {
+      padding: 8px 0 12px;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      line-height: 1.15;
+      margin: 0 0 20px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .results-subsection {
+      text-align: center;
+      font-size: 1.18rem;
+      font-weight: 600;
+      margin: 10px 0;
+    }
+
+    .results-image {
+      width: min(460px, 100%);
+      height: auto;
+      display: block;
+      margin: 12px auto 14px;
+    }
+
+    .results-copy {
+      max-width: 920px;
+      margin: 0 auto 18px;
+      text-align: left;
+      font-size: 1.02rem;
+    }
+
+    .section-copy {
+      max-width: 920px;
+      margin: 0 auto 18px;
+      font-size: 1.04rem;
+    }
+
+    .rldp-question {
+      max-width: 920px;
+      margin: 0 auto 10px;
+      text-align: center;
+      font-size: 1.12rem;
+      font-weight: 600;
+    }
+
+    .rldp-body {
+      max-width: 920px;
+      margin: 0 auto 18px;
+      text-align: left;
+      font-size: 1.04rem;
+    }
+
+    figure {
+      margin: 20px auto 8px;
+      max-width: 980px;
+    }
+
+    .figure-box {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-height: 400px;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .figure-box.blank {
+      background: linear-gradient(180deg, #fcfcfd, #f5f6f8);
+    }
+
+    .figure-box.plain-media {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      min-height: 0;
+      padding: 0;
+      display: block;
+    }
+
+    .figure-box.plain-media img {
+      width: 50%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      border-radius: 0;
+    }
+
+    .gif-space {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 1.5px dashed #cfd4dc;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      color: #9097a1;
+      background: #fafbfd;
+      font-size: 1rem;
+    }
+
+    figcaption {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.97rem;
+      margin-top: 10px;
+    }
+
+    .footer-space {
+      height: 40px;
+    }
+
+    @media (max-width: 720px) {
+      .hero-media { min-height: 260px; }
+      .figure-box { min-height: 260px; }
+      .authors {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+      .authors, .meta, .section-copy { font-size: 0.98rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Regularized Latent Dynamics Prediction is a Strong Baseline for Behavioral Foundation Models</h1>
+
+      <div class="authors">
+        <div class="author-item"><a href="https://pranayajajoo.github.io/">Pranaya Jajoo<sup>&theta;</sup></a></div>
+        <div class="author-item"><a href="https://hari-sikchi.github.io/">Harshit Sikchi*<sup>&phi;</sup></a></div>
+        <div class="author-item"><a href="https://agarwalsiddhant10.github.io/">Siddhant Agarwal*<sup>&phi;</sup></a></div>
+        <div class="author-item"><a href="https://www.ece.utexas.edu/people/faculty/amy-zhang">Amy Zhang<sup>&phi;</sup></a></div>
+        <div class="author-item"><a href="https://people.cs.umass.edu/~sniekum/index.php">Scott Niekum<sup>&psi;</sup></a></div>
+        <div class="author-item"><a href="https://webdocs.cs.ualberta.ca/~whitem/index.html">Martha White<sup>&theta;</sup></a></div>
+      </div>
+      <div class="contrib-note">
+        * Equal contribution
+      </div>
+      <div class="meta">
+        <div class="meta-affiliations">
+          <span><sup>&theta;</sup> University of Alberta</span>
+          <span><sup>&phi;</sup> UT Austin</span>
+          <span><sup>&psi;</sup> UMass Amherst</span>
+        </div>
+      </div>
+
+      <div class="paper-links">
+        <a href="https://arxiv.org/abs/2603.15857">Paper</a>
+      </div>
+
+      <div class="note">
+        Note: This page is meant to provide an informal overview of the ideas in our work. For a more detailed and formal understanding, please check out our paper.
+      </div>
+    </section>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="wrap">
+    <section>
+      <h2>RLDP</h2>
+      <div class="rldp-question">
+        Does latent next-state prediction produce state features that enable performant zero-shot RL?
+      </div>
+      <div class="rldp-body">
+        Our work investigates if using simple dynamics prediction is enough to learn strong representations for zero-shot RL. We show that using dynamics prediction in its naive form can lead to a mild form of feature collapse. However, when used with a regularizer to encourage representation diversity, this method is performant to many state of the art methods and can even work with low-coverage datasets, where many existing representation learning methods exhibit poor zero-shot performance.
+      </div>
+      <figure>
+        <div class="figure-box plain-media">
+          <img src="rldp_site_assets/method_gif.gif" alt="Overview of RLDP" />
+        </div>
+        <figcaption>Figure 1: Overview of RLDP</figcaption>
+      </figure>
+    </section>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="wrap">
+    <section>
+      <h2>How it works?</h2>
+      <figure>
+        <div class="figure-box blank"></div>
+      </figure>
+    </section>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="wrap">
+    <section>
+      <h2>Results</h2>
+      <div class="results-subsection">Offline Zero-Shot RL</div>
+      <div class="results-copy">
+        We consider continuous control tasks from DeepMind control suite -- Pointmass, Cheetah, Walker, Quadruped under a similar setup considered by prior works in zero-shot RL to benchmark RLDP with respect to state-of-the-art methods. We use datasets from the ExoRL suite that are obtained by an exploratory algorithm RND . Random features use representations from a randomly initialized NN encoder.
+      </div>
+      <img class="results-image" src="rldp_site_assets/results-offlinezeroshotRL.png" alt="Offline Zero-Shot RL results" />
+      <div class="results-subsection">Online Zero-Shot RL</div>
+      <div class="results-copy">
+        We also explore if the learned representation enable competitive multi-task learning when agent is allowed interaction with the environment. For this experiment, we experiment in the high-dimensional SMPL humanoid environment and perform evaluation on 45 different tasks. The representations are trained offline using a fixed dataset. Then, we freeze the representations and do the policy learning online with an oracle policy. The violin plot having the mean above 0 indicates that RLDP is mostly competitive and sometimes better than baseline representation learning methods.
+      </div>
+      <img class="results-image" src="rldp_site_assets/humanoid_violin_1.png" alt="Online Zero-Shot RL humanoid results" />
+      <div class="results-subsection">Learning Representations with Low Coverage Datasets</div>
+      <div class="results-copy">
+        RLDP learns a policy-independent representation through latent dynamics prediction. To understand how these representations are impacted by offline data coverage, we evaluate RLDP and baseline methods in the D4RL benchmark of OpenAI Gym MuJoCo tasks. The violin plot shows one-to-one comparison of normalized returns of RLDP against baseline methods. The overall mass of the violin lies above zero, indicating that RLDP outperforms baseline methods in many of these tasks.
+      </div>
+      <img class="results-image" src="rldp_site_assets/d4rl_violin_1.png" alt="Low-coverage dataset representation learning results" />
+    </section>
+    <div class="footer-space"></div>
+  </div>
+</body>
+</html>
