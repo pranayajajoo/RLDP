@@ -31,8 +31,11 @@
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
+    img { max-width: 100%; height: auto; }
+
     .wrap {
-      width: min(var(--maxw), calc(100vw - 36px));
+      width: min(var(--maxw), 100vw);
+      padding: 0 18px;
       margin: 0 auto;
     }
 
@@ -91,8 +94,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 18px;
-      flex-wrap: nowrap;
+      gap: 12px 18px;
+      flex-wrap: wrap;
     }
 
     .hero-media {
@@ -218,9 +221,7 @@
     }
 
     .figure-box.plain-media img {
-      width: 50%;
-      height: auto;
-      display: block;
+      width: clamp(260px, 90vw, 820px);
       margin: 0 auto;
       border-radius: 0;
     }
@@ -256,6 +257,9 @@
         gap: 6px;
       }
       .authors, .meta, .section-copy { font-size: 0.98rem; }
+      .meta-affiliations { flex-direction: column; gap: 6px; }
+      .results-copy, .rldp-body { font-size: 1rem; }
+      figcaption { font-size: 0.9rem; }
     }
   </style>
 </head>
@@ -302,14 +306,19 @@
         Does latent next-state prediction produce state features that enable performant zero-shot RL?
       </div>
       <div class="rldp-body">
-        Our work investigates if using simple dynamics prediction is enough to learn strong representations for zero-shot RL. We show that using dynamics prediction in its naive form can lead to a mild form of feature collapse. However, when used with a regularizer to encourage representation diversity, this method is performant to many state of the art methods and can even work with low-coverage datasets, where many existing representation learning methods exhibit poor zero-shot performance.
+        <p>We show that using dynamics prediction in its naive form can lead to a mild form of feature collapse.</p>
+        <figure>
+          <div class="figure-box plain-media">
+            <img src="rldp_site_assets/cosine_collapse.png" alt="Feature collapse under naive dynamics prediction" />
+          </div>
+        </figure>
+        <p>However, using a regularizer encourages representation diversity, leading to features both predictive of future state evolution and diverse enough to support a broad family of rewards.</p>
+        <figure>
+          <div class="figure-box plain-media">
+            <img src="rldp_site_assets/cosine_improvement.png" alt="Improved representation diversity with regularization" />
+          </div>
+        </figure>
       </div>
-      <figure>
-        <div class="figure-box plain-media">
-          <img src="rldp_site_assets/method_gif.gif" alt="Overview of RLDP" />
-        </div>
-        <figcaption>Figure 1: Overview of RLDP</figcaption>
-      </figure>
     </section>
   </div>
 
@@ -319,7 +328,10 @@
     <section>
       <h2>How it works?</h2>
       <figure>
-        <div class="figure-box blank"></div>
+        <div class="figure-box plain-media">
+          <img src="rldp_site_assets/method_gif.gif" alt="Overview of RLDP" />
+        </div>
+        <figcaption>Figure 1: Overview of RLDP</figcaption>
       </figure>
     </section>
   </div>
