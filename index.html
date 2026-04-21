@@ -3,361 +3,867 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RLDP — Regularized Latent Dynamics Prediction</title>
+  <title>RLDP | Regularized Latent Dynamics Prediction</title>
   <style>
     :root {
-      --bg: #fafafa;
-      --panel: #ffffff;
-      --soft: #f3f4f6;
-      --line: #e6e8eb;
-      --text: #171717;
-      --muted: #666;
-      --accent: #2f5cff;
-      --maxw: 1040px;
-      --shadow: 0 12px 32px rgba(0,0,0,0.06);
-      --radius: 22px;
+      --bg: #f4f1ea;
+      --surface: rgba(255, 252, 246, 0.82);
+      --surface-strong: #fffdf9;
+      --surface-alt: #f7f1e6;
+      --text: #1f1c18;
+      --muted: #6f665c;
+      --line: rgba(90, 74, 56, 0.14);
+      --line-strong: rgba(90, 74, 56, 0.22);
+      --accent: #9a3412;
+      --accent-deep: #6f1d1b;
+      --accent-soft: #f6d7c3;
+      --gold: #b88a35;
+      --shadow: 0 24px 60px rgba(77, 55, 31, 0.10);
+      --shadow-soft: 0 18px 40px rgba(77, 55, 31, 0.08);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --maxw: 1180px;
+      --nav-h: 74px;
     }
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
       color: var(--text);
-      background: var(--bg);
-      line-height: 1.65;
+      background:
+        radial-gradient(circle at top left, rgba(184, 138, 53, 0.18), transparent 32%),
+        radial-gradient(circle at top right, rgba(154, 52, 18, 0.14), transparent 30%),
+        linear-gradient(180deg, #f8f4ed 0%, #f4f1ea 28%, #efe8dc 100%);
+      line-height: 1.7;
     }
 
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 78%);
+    }
 
-    img { max-width: 100%; height: auto; }
+    img { display: block; max-width: 100%; height: auto; }
+    a { color: inherit; text-decoration: none; }
 
     .wrap {
-      width: min(var(--maxw), 100vw);
-      padding: 0 18px;
+      width: min(var(--maxw), calc(100vw - 32px));
       margin: 0 auto;
     }
 
-    .hero {
-      padding: 34px 0 22px;
-      text-align: center;
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(16px);
+      background: rgba(248, 244, 237, 0.72);
+      border-bottom: 1px solid rgba(90, 74, 56, 0.08);
     }
 
-    h1 {
-      margin: 0 auto 18px;
-      max-width: 980px;
-      font-size: clamp(2.3rem, 5vw, 3.65rem);
-      line-height: 1.08;
+    .nav-inner {
+      width: min(var(--maxw), calc(100vw - 32px));
+      min-height: var(--nav-h);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.92rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-family: Georgia, "Times New Roman", serif;
       font-weight: 700;
-      letter-spacing: -0.035em;
+      letter-spacing: 0;
+      color: var(--surface-strong);
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+
+    main {
+      padding: 28px 0 72px;
+    }
+
+    [id] {
+      scroll-margin-top: calc(var(--nav-h) + 18px);
+    }
+
+    .hero {
+      padding-top: 22px;
+    }
+
+    .hero-shell {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 36px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(184, 138, 53, 0.20), transparent 22%),
+        radial-gradient(circle at 82% 0%, rgba(154, 52, 18, 0.18), transparent 28%),
+        linear-gradient(135deg, rgba(255, 253, 249, 0.96), rgba(248, 241, 230, 0.90));
+      box-shadow: var(--shadow);
+    }
+
+    .hero-shell::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -20% auto;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(184, 138, 53, 0.18), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.98fr);
+      gap: 38px;
+      padding: 56px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(90, 74, 56, 0.10);
+      color: var(--muted);
+      font-size: 0.84rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero h1,
+    h2,
+    h3,
+    .stat-value {
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .hero h1 {
+      margin: 18px 0 18px;
+      max-width: 12ch;
+      font-size: clamp(2.8rem, 6vw, 5.25rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+    }
+
+    .hero-lead {
+      max-width: 58ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(111, 29, 27, 0.15);
+    }
+
+    .button.primary {
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+      color: var(--surface-strong);
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.7);
+      border-color: var(--line);
+      color: var(--text);
+    }
+
+    .hero-meta {
+      margin-top: 28px;
+      display: grid;
+      gap: 16px;
     }
 
     .authors {
-      max-width: 920px;
-      margin: 0 auto 8px;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px 18px;
-      font-size: 1.05rem;
-      align-items: center;
-      justify-items: center;
+      gap: 10px 16px;
+      font-size: 1rem;
     }
 
     .author-item a {
       color: var(--text);
-      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 160ms ease, color 160ms ease;
     }
 
     .author-item a:hover {
-      text-decoration: underline;
+      color: var(--accent-deep);
+      border-color: rgba(111, 29, 27, 0.28);
     }
 
-    .contrib-note {
-      margin: 2px auto 10px;
-      max-width: 920px;
-      color: var(--muted);
-      font-size: 0.94rem;
-      text-align: center;
-    }
-
-    .meta {
-      max-width: 920px;
-      margin: 0 auto;
-      color: var(--muted);
-      font-size: 1rem;
-      text-align: center;
-      line-height: 1.55;
-    }
-
-    .meta-affiliations {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px 18px;
-      flex-wrap: wrap;
-    }
-
-    .hero-media {
-      margin: 28px auto 14px;
-      background: linear-gradient(180deg, #fbfbfb, #f2f3f6);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      min-height: 430px;
-      display: grid;
-      place-items: center;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .hero-media .placeholder {
-      color: #8a8f98;
-      font-size: 1rem;
-      padding: 18px;
-      text-align: center;
-    }
-
-    .paper-links {
-      margin-top: 14px;
-      font-size: 1.02rem;
-    }
-
+    .meta-row,
     .note {
-      margin: 18px auto 0;
-      max-width: 860px;
       color: var(--muted);
-      font-size: 0.98rem;
+      font-size: 0.96rem;
     }
 
-    .divider {
-      border: 0;
-      border-top: 1px solid var(--line);
-      margin: 34px auto 28px;
-      width: min(var(--maxw), calc(100vw - 36px));
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
     }
 
-    section {
-      padding: 8px 0 12px;
+    .hero-visual {
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      border: 1px solid rgba(90, 74, 56, 0.10);
+      background: linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(244, 236, 225, 0.96));
+      box-shadow: var(--shadow-soft);
+      padding: 18px;
+    }
+
+    .hero-card img {
+      width: 100%;
+      border-radius: 18px;
+    }
+
+    .hero-card-caption {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card {
+      border-radius: 22px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(90, 74, 56, 0.10);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .section-block {
+      padding-top: 82px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .section-kicker {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--accent-deep);
+      font-size: 0.84rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
     h2 {
-      text-align: center;
-      font-size: clamp(1.8rem, 3vw, 2.5rem);
-      line-height: 1.15;
-      margin: 0 0 20px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
     }
 
-    .results-subsection {
-      text-align: center;
-      font-size: 1.18rem;
-      font-weight: 600;
-      margin: 10px 0;
-    }
-
-    .results-image {
-      width: min(460px, 100%);
-      height: auto;
-      display: block;
-      margin: 12px auto 14px;
-    }
-
-    .results-copy {
-      max-width: 920px;
-      margin: 0 auto 18px;
-      text-align: left;
+    .section-summary {
+      max-width: 58ch;
+      margin: 0;
+      color: var(--muted);
       font-size: 1.02rem;
     }
 
-    .section-copy {
-      max-width: 920px;
-      margin: 0 auto 18px;
-      font-size: 1.04rem;
+    .feature-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 22px;
+      align-items: stretch;
     }
 
-    .rldp-question {
-      max-width: 920px;
-      margin: 0 auto 10px;
-      text-align: center;
-      font-size: 1.12rem;
-      font-weight: 600;
-    }
-
-    .rldp-body {
-      max-width: 920px;
-      margin: 0 auto 18px;
-      text-align: left;
-      font-size: 1.04rem;
-    }
-
-    figure {
-      margin: 20px auto 8px;
-      max-width: 980px;
-    }
-
-    .figure-box {
-      background: var(--panel);
+    .card {
+      background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      min-height: 400px;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(10px);
+    }
+
+    .spotlight {
+      padding: 30px;
+    }
+
+    .spotlight h3 {
+      margin: 0 0 12px;
+      font-size: clamp(1.6rem, 2.6vw, 2.25rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .spotlight p {
+      margin: 0 0 20px;
+      color: var(--muted);
+    }
+
+    .bullet-list {
       display: grid;
-      place-items: center;
-      padding: 24px;
+      gap: 12px;
     }
 
-    .figure-box.blank {
-      background: linear-gradient(180deg, #fcfcfd, #f5f6f8);
+    .bullet-item {
+      display: grid;
+      grid-template-columns: 14px 1fr;
+      gap: 12px;
+      align-items: start;
+      color: var(--text);
     }
 
-    .figure-box.plain-media {
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      min-height: 0;
-      padding: 0;
-      display: block;
+    .bullet-item::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      margin-top: 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--gold), var(--accent));
+      box-shadow: 0 0 0 5px rgba(184, 138, 53, 0.12);
     }
 
-    .figure-box.plain-media img {
-      width: clamp(260px, 90vw, 820px);
-      margin: 0 auto;
-      border-radius: 0;
+    .figure-card {
+      padding: 18px;
     }
 
-    .gif-space {
+    .figure-frame {
+      overflow: hidden;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #fffaf2, #f2e6d7);
+      border: 1px solid rgba(90, 74, 56, 0.10);
+      padding: 14px;
+    }
+
+    .figure-card img,
+    .result-card img {
       width: 100%;
-      aspect-ratio: 16 / 9;
-      border: 1.5px dashed #cfd4dc;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      color: #9097a1;
-      background: #fafbfd;
-      font-size: 1rem;
+      border-radius: 14px;
     }
 
-    figcaption {
+    .figure-card figcaption,
+    .result-caption {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .method-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+      gap: 22px;
+    }
+
+    .method-card,
+    .method-side {
+      padding: 26px;
+    }
+
+    .method-card h3,
+    .method-side h3,
+    .result-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+    }
+
+    .method-card p,
+    .method-side p,
+    .result-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .method-card figure {
+      margin: 22px 0 0;
+    }
+
+    .signal-list {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    .signal-list li {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(90, 74, 56, 0.10);
+    }
+
+    .signal-list strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .result-card {
+      padding: 18px;
+    }
+
+    .result-media {
+      padding: 14px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #fffaf2, #f3e7d9);
+      border: 1px solid rgba(90, 74, 56, 0.10);
+    }
+
+    .result-copy {
+      padding: 18px 6px 4px;
+    }
+
+    .footer {
+      padding: 78px 0 36px;
       text-align: center;
       color: var(--muted);
-      font-size: 0.97rem;
-      margin-top: 10px;
+      font-size: 0.94rem;
     }
 
-    .footer-space {
-      height: 40px;
-    }
-
-    @media (max-width: 720px) {
-      .hero-media { min-height: 260px; }
-      .figure-box { min-height: 260px; }
-      .authors {
+    @media (max-width: 1080px) {
+      .hero-grid,
+      .feature-grid,
+      .method-layout,
+      .results-grid {
         grid-template-columns: 1fr;
-        gap: 6px;
       }
-      .authors, .meta, .section-copy { font-size: 0.98rem; }
-      .meta-affiliations { flex-direction: column; gap: 6px; }
-      .results-copy, .rldp-body { font-size: 1rem; }
-      figcaption { font-size: 0.9rem; }
+
+      .hero-grid {
+        padding: 42px 28px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      :root { --nav-h: 66px; }
+
+      .nav-inner {
+        padding: 10px 0;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .authors,
+      .stat-row {
+        grid-template-columns: 1fr;
+      }
+
+      .section-header {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .wrap,
+      .nav-inner {
+        width: min(var(--maxw), calc(100vw - 20px));
+      }
+
+      main {
+        padding-top: 18px;
+      }
+
+      .hero-shell {
+        border-radius: 28px;
+      }
+
+      .hero-grid {
+        padding: 28px 18px;
+        gap: 26px;
+      }
+
+      .hero h1 {
+        max-width: none;
+        font-size: clamp(2.2rem, 11vw, 3.4rem);
+      }
+
+      h2 {
+        font-size: clamp(1.8rem, 8vw, 2.4rem);
+      }
+
+      .spotlight,
+      .method-card,
+      .method-side,
+      .result-card,
+      .figure-card {
+        padding: 18px;
+      }
+
+      .button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="hero">
-      <h1>Regularized Latent Dynamics Prediction is a Strong Baseline for Behavioral Foundation Models</h1>
-
-      <div class="authors">
-        <div class="author-item"><a href="https://pranayajajoo.github.io/">Pranaya Jajoo<sup>&theta;</sup></a></div>
-        <div class="author-item"><a href="https://hari-sikchi.github.io/">Harshit Sikchi*<sup>&phi;</sup></a></div>
-        <div class="author-item"><a href="https://agarwalsiddhant10.github.io/">Siddhant Agarwal*<sup>&phi;</sup></a></div>
-        <div class="author-item"><a href="https://www.ece.utexas.edu/people/faculty/amy-zhang">Amy Zhang<sup>&phi;</sup></a></div>
-        <div class="author-item"><a href="https://people.cs.umass.edu/~sniekum/index.php">Scott Niekum<sup>&psi;</sup></a></div>
-        <div class="author-item"><a href="https://webdocs.cs.ualberta.ca/~whitem/index.html">Martha White<sup>&theta;</sup></a></div>
-      </div>
-      <div class="contrib-note">
-        * Equal contribution
-      </div>
-      <div class="meta">
-        <div class="meta-affiliations">
-          <span><sup>&theta;</sup> University of Alberta</span>
-          <span><sup>&phi;</sup> UT Austin</span>
-          <span><sup>&psi;</sup> UMass Amherst</span>
-        </div>
-      </div>
-
-      <div class="paper-links">
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark">R</span>
+        <span>Regularized Latent Dynamics Prediction</span>
+      </a>
+      <div class="nav-links">
+        <a href="#overview">Overview</a>
+        <a href="#insight">Why RLDP</a>
+        <a href="#method">How It Works</a>
+        <a href="#results">Results</a>
         <a href="https://arxiv.org/abs/2603.15857">Paper</a>
       </div>
+    </div>
+  </nav>
 
-      <div class="note">
-        Note: This page is meant to provide an informal overview of the ideas in our work. For a more detailed and formal understanding, please check out our paper.
-      </div>
-    </section>
-  </div>
+  <main id="top">
+    <div class="wrap hero" id="overview">
+      <section class="hero-shell">
+        <div class="hero-grid">
+          <div>
+            <span class="eyebrow">Behavior Foundation Models • Zero-Shot RL</span>
+            <h1>Regularized Latent Dynamics Prediction is a Strong Baseline for Behavioral Foundation Models</h1>
+            <p class="hero-lead">
+              RLDP asks a simple question with surprisingly strong consequences: can next-state prediction alone
+              produce representations useful for zero-shot reinforcement learning? The answer is yes, if we prevent
+              the representation from collapsing and make diversity a first-class objective.
+            </p>
 
-  <hr class="divider" />
+            <div class="hero-actions">
+              <a class="button primary" href="https://arxiv.org/abs/2603.15857">Read the Paper</a>
+              <a class="button secondary" href="#method">See How It Works</a>
+            </div>
 
-  <div class="wrap">
-    <section>
-      <h2>RLDP</h2>
-      <div class="rldp-question">
-        Does latent next-state prediction produce state features that enable performant zero-shot RL?
-      </div>
-      <div class="rldp-body">
-        <p>We show that using dynamics prediction in its naive form can lead to a mild form of feature collapse.</p>
-        <figure>
-          <div class="figure-box plain-media">
-            <img src="rldp_site_assets/cosine_collapse.png" alt="Feature collapse under naive dynamics prediction" />
+            <div class="hero-meta">
+              <div class="authors">
+                <div class="author-item"><a href="https://pranayajajoo.github.io/">Pranaya Jajoo<sup>&theta;</sup></a></div>
+                <div class="author-item"><a href="https://hari-sikchi.github.io/">Harshit Sikchi*<sup>&phi;</sup></a></div>
+                <div class="author-item"><a href="http://agarwalsiddhant10.github.io/">Siddhant Agarwal*<sup>&phi;</sup></a></div>
+                <div class="author-item"><a href="https://www.ece.utexas.edu/people/faculty/amy-zhang/">Amy Zhang<sup>&phi;</sup></a></div>
+                <div class="author-item"><a href="https://people.cs.umass.edu/~sniekum/">Scott Niekum<sup>&psi;</sup></a></div>
+                <div class="author-item"><a href="https://webdocs.cs.ualberta.ca/~whitem/">Martha White<sup>&theta;</sup></a></div>
+              </div>
+
+              <div class="meta-row">
+                <span>* Equal contribution</span>
+                <span><sup>&theta;</sup> University of Alberta</span>
+                <span><sup>&phi;</sup> UT Austin</span>
+                <span><sup>&psi;</sup> UMass Amherst</span>
+              </div>
+
+              <p class="note">
+                This page is designed as an informal project story for the paper. For the complete technical treatment,
+                please refer to the manuscript.
+              </p>
+            </div>
           </div>
-        </figure>
-        <p>However, using a regularizer encourages representation diversity, leading to features both predictive of future state evolution and diverse enough to support a broad family of rewards.</p>
-        <figure>
-          <div class="figure-box plain-media">
-            <img src="rldp_site_assets/cosine_improvement.png" alt="Improved representation diversity with regularization" />
+
+          <div class="hero-visual">
+            <div class="hero-card">
+              <img src="rldp_site_assets/method_gif.gif" alt="Overview animation of RLDP" />
+              <div class="hero-card-caption">Figure 1. RLDP learns a policy-independent representation by predicting latent future state evolution while explicitly regularizing for diversity.</div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-card">
+                <div class="stat-value">Simple</div>
+                <div class="stat-label">Dynamics prediction stays at the core of the method.</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">Diverse</div>
+                <div class="stat-label">Regularization prevents mild collapse in the learned features.</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">Strong</div>
+                <div class="stat-label">Competitive zero-shot performance across offline and online settings.</div>
+              </div>
+            </div>
           </div>
-        </figure>
-      </div>
-    </section>
-  </div>
-
-  <hr class="divider" />
-
-  <div class="wrap">
-    <section>
-      <h2>How it works?</h2>
-      <figure>
-        <div class="figure-box plain-media">
-          <img src="rldp_site_assets/method_gif.gif" alt="Overview of RLDP" />
         </div>
-        <figcaption>Figure 1: Overview of RLDP</figcaption>
-      </figure>
-    </section>
-  </div>
+      </section>
+    </div>
 
-  <hr class="divider" />
+    <div class="wrap section-block" id="insight">
+      <section>
+        <div class="section-header">
+          <div>
+            <span class="section-kicker">Core insight</span>
+            <h2>Prediction alone is not enough. Predictive and diverse is the real target.</h2>
+          </div>
+          <p class="section-summary">
+            RLDP shows that naive latent dynamics prediction can drift toward a mild form of feature collapse.
+            The regularized variant keeps the representation expressive, preserving structure that can support
+            a broader family of downstream rewards without losing predictive power.
+          </p>
+        </div>
 
-  <div class="wrap">
-    <section>
-      <h2>Results</h2>
-      <div class="results-subsection">Offline Zero-Shot RL</div>
-      <div class="results-copy">
-        We consider continuous control tasks from DeepMind control suite -- Pointmass, Cheetah, Walker, Quadruped under a similar setup considered by prior works in zero-shot RL to benchmark RLDP with respect to state-of-the-art methods. We use datasets from the ExoRL suite that are obtained by an exploratory algorithm RND . Random features use representations from a randomly initialized NN encoder.
-      </div>
-      <img class="results-image" src="rldp_site_assets/results-offlinezeroshotRL.png" alt="Offline Zero-Shot RL results" />
-      <div class="results-subsection">Online Zero-Shot RL</div>
-      <div class="results-copy">
-        We also explore if the learned representation enable competitive multi-task learning when agent is allowed interaction with the environment. For this experiment, we experiment in the high-dimensional SMPL humanoid environment and perform evaluation on 45 different tasks. The representations are trained offline using a fixed dataset. Then, we freeze the representations and do the policy learning online with an oracle policy. The violin plot having the mean above 0 indicates that RLDP is mostly competitive and sometimes better than baseline representation learning methods.
-      </div>
-      <img class="results-image" src="rldp_site_assets/humanoid_violin_1.png" alt="Online Zero-Shot RL humanoid results" />
-      <div class="results-subsection">Learning Representations with Low Coverage Datasets</div>
-      <div class="results-copy">
-        RLDP learns a policy-independent representation through latent dynamics prediction. To understand how these representations are impacted by offline data coverage, we evaluate RLDP and baseline methods in the D4RL benchmark of OpenAI Gym MuJoCo tasks. The violin plot shows one-to-one comparison of normalized returns of RLDP against baseline methods. The overall mass of the violin lies above zero, indicating that RLDP outperforms baseline methods in many of these tasks.
-      </div>
-      <img class="results-image" src="rldp_site_assets/d4rl_violin_1.png" alt="Low-coverage dataset representation learning results" />
-    </section>
-    <div class="footer-space"></div>
-  </div>
+        <div class="feature-grid">
+          <article class="card spotlight">
+            <h3>Why the baseline matters</h3>
+            <p>
+              Strong behavior foundation models do not always require elaborate objectives. RLDP intentionally keeps the
+              learning signal simple, then asks what minimal ingredient is needed to make it robust for zero-shot RL.
+            </p>
+            <div class="bullet-list">
+              <div class="bullet-item"><div>Naive next-state prediction can over-concentrate features and reduce coverage of useful directions in representation space.</div></div>
+              <div class="bullet-item"><div>A diversity regularizer counteracts collapse while still keeping features predictive of future state evolution.</div></div>
+              <div class="bullet-item"><div>The resulting representation transfers well across benchmark settings, including lower-coverage offline datasets.</div></div>
+            </div>
+          </article>
+
+          <figure class="card figure-card">
+            <div class="figure-frame">
+              <img src="rldp_site_assets/cosine_collapse.png" alt="Cosine similarity visualization showing feature collapse with naive dynamics prediction" />
+            </div>
+            <figcaption>Naive latent dynamics prediction tends to cluster features too aggressively, producing a mild but measurable collapse.</figcaption>
+          </figure>
+        </div>
+
+        <div class="feature-grid" style="margin-top: 22px;">
+          <figure class="card figure-card">
+            <div class="figure-frame">
+              <img src="rldp_site_assets/cosine_improvement.png" alt="Cosine similarity visualization showing improved feature diversity with RLDP regularization" />
+            </div>
+            <figcaption>With regularization, the representation stays structured and diverse enough to support richer downstream reward families.</figcaption>
+          </figure>
+
+          <article class="card spotlight">
+            <h3>What changes with regularization</h3>
+            <p>
+              The regularizer does not replace the predictive objective. Instead, it reshapes the geometry of the learned
+              space so RLDP can encode futures that remain both discriminative and reusable for zero-shot control.
+            </p>
+            <div class="bullet-list">
+              <div class="bullet-item"><div>Future evolution is still encoded through dynamics prediction in latent space.</div></div>
+              <div class="bullet-item"><div>Representation diversity improves the usefulness of those features for many rewards, not just one narrow objective.</div></div>
+              <div class="bullet-item"><div>The method remains simple enough to serve as a clean, credible baseline for behavioral foundation models.</div></div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <div class="wrap section-block" id="method">
+      <section>
+        <div class="section-header">
+          <div>
+            <span class="section-kicker">Method</span>
+            <h2>How RLDP works</h2>
+          </div>
+          <p class="section-summary">
+            The representation is learned from offline interaction data through latent next-state prediction, then improved
+            with a regularizer that explicitly protects the diversity of the embedding space.
+          </p>
+        </div>
+
+        <div class="method-layout">
+          <article class="card method-card">
+            <h3>Overview of the learning pipeline</h3>
+            <p>
+              RLDP uses a compact idea: encode observations, predict how those latent states evolve, and regularize the
+              geometry of the features so they remain broadly useful for reward-conditioned downstream control.
+            </p>
+            <figure>
+              <div class="figure-frame">
+                <img src="rldp_site_assets/method_gif.gif" alt="Animated method overview for RLDP" />
+              </div>
+              <figcaption>Figure 1. RLDP combines latent dynamics prediction with a representation diversity regularizer.</figcaption>
+            </figure>
+          </article>
+
+          <aside class="card method-side">
+            <h3>Design principles</h3>
+            <p>
+              The method is intentionally lightweight, making it easier to interpret what each ingredient contributes.
+            </p>
+            <ul class="signal-list">
+              <li>
+                <strong>Predict future state evolution</strong>
+                Learn a representation grounded in how the environment changes over time.
+              </li>
+              <li>
+                <strong>Guard against collapse</strong>
+                Encourage the embedding space to retain multiple informative directions.
+              </li>
+              <li>
+                <strong>Transfer without task labels</strong>
+                Evaluate the frozen representation through zero-shot reinforcement learning downstream.
+              </li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+    </div>
+
+    <div class="wrap section-block" id="results">
+      <section>
+        <div class="section-header">
+          <div>
+            <span class="section-kicker">Results</span>
+            <h2>Competitive performance across the settings that matter</h2>
+          </div>
+          <p class="section-summary">
+            RLDP is evaluated in offline zero-shot RL, online zero-shot RL, and low-coverage dataset settings.
+            Across these experiments, the message is consistent: a simple predictive baseline becomes strong when its
+            representation geometry is handled carefully.
+          </p>
+        </div>
+
+        <div class="results-grid">
+          <article class="card result-card">
+            <div class="result-media">
+              <img src="rldp_site_assets/results-offlinezeroshotRL.png" alt="Offline zero-shot RL benchmark results" />
+            </div>
+            <div class="result-copy">
+              <h3>Offline Zero-Shot RL</h3>
+              <p>
+                On DeepMind Control Suite tasks with ExoRL data, RLDP remains competitive with state-of-the-art
+                representation learning baselines while keeping the training objective simple and interpretable.
+              </p>
+              <div class="result-caption">Benchmarks include Pointmass, Cheetah, Walker, and Quadruped.</div>
+            </div>
+          </article>
+
+          <article class="card result-card">
+            <div class="result-media">
+              <img src="rldp_site_assets/humanoid_violin_1.png" alt="Online zero-shot RL results in SMPL humanoid tasks" />
+            </div>
+            <div class="result-copy">
+              <h3>Online Zero-Shot RL</h3>
+              <p>
+                In the high-dimensional SMPL humanoid setting, frozen RLDP representations enable strong multi-task policy
+                learning when the agent is later allowed online interaction.
+              </p>
+              <div class="result-caption">Evaluation spans 45 tasks, with the violin plot showing RLDP is frequently competitive or better.</div>
+            </div>
+          </article>
+
+          <article class="card result-card">
+            <div class="result-media">
+              <img src="rldp_site_assets/d4rl_violin_1.png" alt="Low-coverage dataset results in D4RL benchmark" />
+            </div>
+            <div class="result-copy">
+              <h3>Low-Coverage Datasets</h3>
+              <p>
+                RLDP stays effective when the offline data distribution becomes less forgiving, outperforming baseline
+                methods on many D4RL MuJoCo tasks where representation quality is especially sensitive to coverage.
+              </p>
+              <div class="result-caption">The mass of the violin above zero indicates broad advantages over comparison methods.</div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <div class="wrap footer">
+      <div>RLDP highlights how a carefully regularized predictive objective can become a reliable baseline for zero-shot reinforcement learning.</div>
+    </div>
+  </main>
 </body>
 </html>
