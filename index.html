@@ -209,6 +209,27 @@
       font-size: 1.04rem;
     }
 
+    .video-embed {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .video-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: #000;
+    }
+
+    .video-frame iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
     .rldp-question {
       max-width: 920px;
       margin: 0 auto 16px;
@@ -255,6 +276,13 @@
       display: block;
     }
 
+    .rldp-body figure,
+    .how-it-works figure {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .figure-box.plain-media img {
       width: clamp(260px, 90vw, 820px);
       margin: 0 auto;
@@ -263,6 +291,18 @@
 
     .rldp-body .figure-box.plain-media img {
       width: clamp(220px, 62vw, 520px);
+    }
+
+    .how-it-works .figure-box.plain-media img {
+      width: clamp(220px, 52vw, 440px);
+    }
+
+    .how-it-works-lead {
+      max-width: 920px;
+      margin: 0 auto 12px;
+      text-align: center;
+      font-size: 1.02rem;
+      color: var(--text);
     }
 
     .gif-space {
@@ -345,20 +385,32 @@
 
   <div class="wrap">
     <section>
+      <h2>Talk and Overview</h2>
+      <div class="video-embed">
+        <div class="video-frame">
+          <iframe
+            src="https://www.youtube.com/embed/uUVOUnk7CiE"
+            title="RLDP Talk and Overview"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="wrap">
+    <section>
       <h2 class="rldp-question">
         Does latent next-state prediction produce state features that enable performant zero-shot RL?
       </h2>
       <div class="rldp-body">
-        <p>We show that using dynamics prediction in its naive form can lead to a mild form of feature collapse.</p>
+        <p>Using naive latent next-state prediction can cause a mild form of collapse, where representations of different states become increasingly similar over training.</p>
         <figure>
           <div class="figure-box plain-media">
             <img src="rldp_site_assets/cosine_collapse.png" alt="Feature collapse under naive dynamics prediction" />
-          </div>
-        </figure>
-        <p>However, using a regularizer encourages representation diversity, leading to features both predictive of future state evolution and diverse enough to support a broad family of rewards.</p>
-        <figure>
-          <div class="figure-box plain-media">
-            <img src="rldp_site_assets/cosine_improvement.png" alt="Improved representation diversity with regularization" />
           </div>
         </figure>
       </div>
@@ -368,8 +420,18 @@
   <hr class="divider" />
 
   <div class="wrap">
-    <section>
+    <section class="how-it-works">
       <h2>How it works?</h2>
+      <div class="rldp-body">
+        <p>RLDP combines latent prediction objective with orthogonality regularization to encourage feature diversity and learn more diverse representations.</p>
+        <p>The goal of RLDP is to learn features both predictive of future state evolution and diverse enough to support a broad family of rewards.</p>
+      </div>
+      <figure>
+        <div class="figure-box plain-media">
+          <img src="rldp_site_assets/cosine_improvement.png" alt="Improved representation diversity with regularization" />
+        </div>
+      </figure>
+      <div class="how-it-works-lead">Overall, RLDP comes together like this:</div>
       <figure>
         <div class="figure-box plain-media">
           <img src="rldp_site_assets/method_gif.gif" alt="Overview of RLDP" />
