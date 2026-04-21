@@ -6,21 +6,23 @@
   <title>RLDP | Regularized Latent Dynamics Prediction</title>
   <style>
     :root {
-      --bg: #f4f1ea;
-      --surface: rgba(255, 252, 246, 0.82);
-      --surface-strong: #fffdf9;
-      --surface-alt: #f7f1e6;
-      --text: #1f1c18;
-      --muted: #6f665c;
-      --line: rgba(90, 74, 56, 0.14);
-      --line-strong: rgba(90, 74, 56, 0.22);
+      --bg: #f7f3ee;
+      --bg-deep: #efe5d8;
+      --paper: rgba(255, 252, 247, 0.88);
+      --paper-strong: #fffdf9;
+      --card: rgba(255, 255, 255, 0.72);
+      --card-strong: #fffaf3;
+      --text: #201b16;
+      --muted: #6e655b;
+      --line: rgba(86, 69, 51, 0.13);
+      --line-strong: rgba(86, 69, 51, 0.20);
       --accent: #9a3412;
-      --accent-deep: #6f1d1b;
-      --accent-soft: #f6d7c3;
-      --gold: #b88a35;
-      --shadow: 0 24px 60px rgba(77, 55, 31, 0.10);
-      --shadow-soft: 0 18px 40px rgba(77, 55, 31, 0.08);
-      --radius-xl: 32px;
+      --accent-deep: #6d2018;
+      --accent-soft: rgba(154, 52, 18, 0.10);
+      --gold: #b9852f;
+      --shadow: 0 24px 64px rgba(78, 57, 33, 0.10);
+      --shadow-soft: 0 18px 40px rgba(78, 57, 33, 0.07);
+      --radius-xl: 34px;
       --radius-lg: 24px;
       --radius-md: 18px;
       --maxw: 1180px;
@@ -34,11 +36,11 @@
       margin: 0;
       font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
       color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(184, 138, 53, 0.18), transparent 32%),
-        radial-gradient(circle at top right, rgba(154, 52, 18, 0.14), transparent 30%),
-        linear-gradient(180deg, #f8f4ed 0%, #f4f1ea 28%, #efe8dc 100%);
       line-height: 1.7;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(185, 133, 47, 0.17), transparent 30%),
+        radial-gradient(circle at 100% 0%, rgba(154, 52, 18, 0.12), transparent 24%),
+        linear-gradient(180deg, #fbf8f3 0%, var(--bg) 40%, var(--bg-deep) 100%);
     }
 
     body::before {
@@ -46,16 +48,28 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: 0.35;
+      opacity: 0.22;
       background-image:
-        linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 78%);
+        linear-gradient(rgba(255, 255, 255, 0.20) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.20) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent 82%);
     }
 
-    img { display: block; max-width: 100%; height: auto; }
-    a { color: inherit; text-decoration: none; }
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    [id] {
+      scroll-margin-top: calc(var(--nav-h) + 20px);
+    }
 
     .wrap {
       width: min(var(--maxw), calc(100vw - 32px));
@@ -67,8 +81,8 @@
       top: 0;
       z-index: 20;
       backdrop-filter: blur(16px);
-      background: rgba(248, 244, 237, 0.72);
-      border-bottom: 1px solid rgba(90, 74, 56, 0.08);
+      background: rgba(249, 245, 239, 0.76);
+      border-bottom: 1px solid rgba(86, 69, 51, 0.08);
     }
 
     .nav-inner {
@@ -85,80 +99,82 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 0.92rem;
+      color: var(--muted);
+      font-size: 0.9rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--muted);
     }
 
     .brand-mark {
       width: 42px;
       height: 42px;
-      border-radius: 14px;
       display: grid;
       place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+      color: var(--paper-strong);
       font-family: Georgia, "Times New Roman", serif;
       font-weight: 700;
-      letter-spacing: 0;
-      color: var(--surface-strong);
-      background: linear-gradient(135deg, var(--accent-deep), var(--accent));
       box-shadow: var(--shadow-soft);
     }
 
     .nav-links {
       display: flex;
-      align-items: center;
-      gap: 10px;
       flex-wrap: wrap;
       justify-content: flex-end;
+      gap: 10px;
     }
 
     .nav-links a {
       padding: 10px 14px;
       border-radius: 999px;
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.94rem;
       transition: background 160ms ease, color 160ms ease, transform 160ms ease;
     }
 
     .nav-links a:hover {
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.75);
       color: var(--text);
       transform: translateY(-1px);
     }
 
     main {
-      padding: 28px 0 72px;
+      padding: 28px 0 80px;
     }
 
-    [id] {
-      scroll-margin-top: calc(var(--nav-h) + 18px);
+    .hero-shell,
+    .card,
+    .resource-panel {
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(10px);
     }
 
     .hero {
-      padding-top: 22px;
+      padding-top: 20px;
     }
 
     .hero-shell {
       position: relative;
       overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 36px;
+      border-radius: 38px;
       background:
-        radial-gradient(circle at 18% 18%, rgba(184, 138, 53, 0.20), transparent 22%),
-        radial-gradient(circle at 82% 0%, rgba(154, 52, 18, 0.18), transparent 28%),
-        linear-gradient(135deg, rgba(255, 253, 249, 0.96), rgba(248, 241, 230, 0.90));
+        radial-gradient(circle at 16% 18%, rgba(185, 133, 47, 0.18), transparent 22%),
+        radial-gradient(circle at 90% 10%, rgba(154, 52, 18, 0.14), transparent 24%),
+        linear-gradient(135deg, rgba(255, 253, 249, 0.98), rgba(245, 236, 224, 0.95));
       box-shadow: var(--shadow);
     }
 
     .hero-shell::after {
       content: "";
       position: absolute;
-      inset: auto -10% -20% auto;
+      right: -90px;
+      bottom: -120px;
       width: 320px;
       height: 320px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(184, 138, 53, 0.18), transparent 68%);
+      background: radial-gradient(circle, rgba(185, 133, 47, 0.20), transparent 70%);
       pointer-events: none;
     }
 
@@ -171,43 +187,45 @@
       align-items: center;
     }
 
-    .eyebrow {
+    .eyebrow,
+    .section-kicker {
       display: inline-flex;
       align-items: center;
       gap: 10px;
       padding: 10px 14px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.66);
-      border: 1px solid rgba(90, 74, 56, 0.10);
+      border: 1px solid rgba(86, 69, 51, 0.10);
       color: var(--muted);
-      font-size: 0.84rem;
-      letter-spacing: 0.08em;
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
-    .hero h1,
+    h1,
     h2,
     h3,
-    .stat-value {
+    .fact-number {
       font-family: Georgia, "Times New Roman", serif;
     }
 
-    .hero h1 {
+    h1 {
       margin: 18px 0 18px;
-      max-width: 12ch;
-      font-size: clamp(2.8rem, 6vw, 5.25rem);
-      line-height: 0.96;
-      letter-spacing: -0.05em;
+      max-width: 11ch;
+      font-size: clamp(2.9rem, 6vw, 5.4rem);
+      line-height: 0.95;
+      letter-spacing: -0.055em;
     }
 
     .hero-lead {
-      max-width: 58ch;
+      max-width: 60ch;
       margin: 0;
       color: var(--muted);
       font-size: 1.08rem;
     }
 
-    .hero-actions {
+    .hero-actions,
+    .resource-buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 14px;
@@ -218,7 +236,6 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
       min-height: 48px;
       padding: 0 18px;
       border-radius: 999px;
@@ -228,16 +245,16 @@
 
     .button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 12px 26px rgba(111, 29, 27, 0.15);
+      box-shadow: 0 12px 28px rgba(109, 32, 24, 0.16);
     }
 
     .button.primary {
       background: linear-gradient(135deg, var(--accent-deep), var(--accent));
-      color: var(--surface-strong);
+      color: var(--paper-strong);
     }
 
     .button.secondary {
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.74);
       border-color: var(--line);
       color: var(--text);
     }
@@ -258,16 +275,17 @@
     .author-item a {
       color: var(--text);
       border-bottom: 1px solid transparent;
-      transition: border-color 160ms ease, color 160ms ease;
+      transition: color 160ms ease, border-color 160ms ease;
     }
 
     .author-item a:hover {
       color: var(--accent-deep);
-      border-color: rgba(111, 29, 27, 0.28);
+      border-color: rgba(109, 32, 24, 0.25);
     }
 
     .meta-row,
-    .note {
+    .note,
+    .muted {
       color: var(--muted);
       font-size: 0.96rem;
     }
@@ -283,76 +301,72 @@
       gap: 16px;
     }
 
+    .hero-card,
+    .figure-frame,
+    .result-media {
+      border-radius: 26px;
+      background: linear-gradient(180deg, #fffaf3, #f2e6d7);
+      border: 1px solid rgba(86, 69, 51, 0.10);
+    }
+
     .hero-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: 28px;
-      border: 1px solid rgba(90, 74, 56, 0.10);
-      background: linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(244, 236, 225, 0.96));
-      box-shadow: var(--shadow-soft);
       padding: 18px;
     }
 
-    .hero-card img {
+    .hero-card img,
+    .figure-frame img,
+    .result-media img {
       width: 100%;
-      border-radius: 18px;
+      border-radius: 16px;
     }
 
-    .hero-card-caption {
+    .hero-card-caption,
+    figcaption,
+    .result-caption {
       margin-top: 14px;
       color: var(--muted);
       font-size: 0.95rem;
     }
 
-    .stat-row {
+    .fact-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
     }
 
-    .stat-card {
+    .fact-card {
       border-radius: 22px;
       padding: 18px;
-      background: rgba(255, 255, 255, 0.65);
-      border: 1px solid rgba(90, 74, 56, 0.10);
-      box-shadow: var(--shadow-soft);
+      background: rgba(255, 255, 255, 0.70);
+      border: 1px solid rgba(86, 69, 51, 0.10);
     }
 
-    .stat-value {
-      font-size: 1.5rem;
-      line-height: 1;
+    .fact-number {
       margin-bottom: 8px;
+      font-size: 1.45rem;
+      line-height: 1;
     }
 
-    .stat-label {
+    .fact-label {
       color: var(--muted);
       font-size: 0.92rem;
     }
 
     .section-block {
-      padding-top: 82px;
+      padding-top: 84px;
     }
 
     .section-header {
       display: flex;
       justify-content: space-between;
-      gap: 24px;
       align-items: end;
+      gap: 24px;
       margin-bottom: 24px;
-    }
-
-    .section-kicker {
-      display: block;
-      margin-bottom: 10px;
-      color: var(--accent-deep);
-      font-size: 0.84rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
     }
 
     h2 {
       margin: 0;
-      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-size: clamp(2rem, 4vw, 3.2rem);
       line-height: 0.98;
       letter-spacing: -0.045em;
     }
@@ -364,114 +378,124 @@
       font-size: 1.02rem;
     }
 
-    .feature-grid {
+    .card {
+      background: var(--paper);
+      border-radius: var(--radius-xl);
+    }
+
+    .two-column,
+    .method-grid,
+    .results-grid,
+    .viz-grid,
+    .why-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
       gap: 22px;
+    }
+
+    .two-column {
+      grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
       align-items: stretch;
     }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-soft);
-      backdrop-filter: blur(10px);
+    .method-grid {
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
     }
 
-    .spotlight {
-      padding: 30px;
+    .why-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .spotlight h3 {
+    .results-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .viz-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .panel,
+    .spotlight,
+    .method-card,
+    .sidebar-card,
+    .result-card,
+    .viz-card,
+    .resource-panel {
+      padding: 28px;
+    }
+
+    .panel h3,
+    .spotlight h3,
+    .method-card h3,
+    .sidebar-card h3,
+    .result-card h3,
+    .viz-card h3,
+    .resource-panel h3 {
       margin: 0 0 12px;
-      font-size: clamp(1.6rem, 2.6vw, 2.25rem);
-      line-height: 1.05;
+      font-size: clamp(1.45rem, 2.5vw, 2.1rem);
+      line-height: 1.06;
       letter-spacing: -0.03em;
     }
 
-    .spotlight p {
-      margin: 0 0 20px;
+    .panel p,
+    .spotlight p,
+    .method-card p,
+    .sidebar-card p,
+    .result-card p,
+    .viz-card p,
+    .resource-panel p {
+      margin: 0;
       color: var(--muted);
     }
 
-    .bullet-list {
+    .bullet-list,
+    .check-list {
       display: grid;
       gap: 12px;
+      margin-top: 18px;
     }
 
-    .bullet-item {
+    .bullet-item,
+    .check-item {
       display: grid;
       grid-template-columns: 14px 1fr;
       gap: 12px;
       align-items: start;
-      color: var(--text);
     }
 
-    .bullet-item::before {
+    .bullet-item::before,
+    .check-item::before {
       content: "";
       width: 10px;
       height: 10px;
       margin-top: 8px;
       border-radius: 999px;
       background: linear-gradient(135deg, var(--gold), var(--accent));
-      box-shadow: 0 0 0 5px rgba(184, 138, 53, 0.12);
+      box-shadow: 0 0 0 5px rgba(185, 133, 47, 0.12);
     }
 
-    .figure-card {
-      padding: 18px;
-    }
-
-    .figure-frame {
-      overflow: hidden;
-      border-radius: 22px;
-      background: linear-gradient(180deg, #fffaf2, #f2e6d7);
-      border: 1px solid rgba(90, 74, 56, 0.10);
+    .figure-frame,
+    .result-media {
       padding: 14px;
     }
 
-    .figure-card img,
-    .result-card img {
-      width: 100%;
-      border-radius: 14px;
-    }
-
-    .figure-card figcaption,
-    .result-caption {
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .method-layout {
+    .mini-metrics {
       display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
-      gap: 22px;
+      gap: 12px;
+      margin-top: 20px;
     }
 
-    .method-card,
-    .method-side {
-      padding: 26px;
+    .mini-metrics div {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(86, 69, 51, 0.10);
+      color: var(--text);
     }
 
-    .method-card h3,
-    .method-side h3,
-    .result-card h3 {
-      margin: 0 0 10px;
-      font-size: 1.5rem;
-      line-height: 1.08;
-      letter-spacing: -0.025em;
-    }
-
-    .method-card p,
-    .method-side p,
-    .result-card p {
-      margin: 0;
-      color: var(--muted);
-    }
-
-    .method-card figure {
-      margin: 22px 0 0;
+    .mini-metrics strong,
+    .signal-list strong {
+      display: block;
+      margin-bottom: 4px;
     }
 
     .signal-list {
@@ -485,35 +509,61 @@
     .signal-list li {
       padding: 14px 16px;
       border-radius: 18px;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(90, 74, 56, 0.10);
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(86, 69, 51, 0.10);
+      color: var(--muted);
     }
 
-    .signal-list strong {
-      display: block;
-      margin-bottom: 4px;
-      color: var(--text);
+    .reason-card {
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
     }
 
-    .results-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 22px;
+    .reason-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.32rem;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
     }
 
-    .result-card {
-      padding: 18px;
+    .reason-card p {
+      margin: 0;
+      color: var(--muted);
     }
 
-    .result-media {
-      padding: 14px;
-      border-radius: 22px;
-      background: linear-gradient(180deg, #fffaf2, #f3e7d9);
-      border: 1px solid rgba(90, 74, 56, 0.10);
+    .result-card,
+    .viz-card {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
     }
 
     .result-copy {
-      padding: 18px 6px 4px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .resource-panel {
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(185, 133, 47, 0.10), transparent 28%),
+        linear-gradient(135deg, rgba(255, 253, 249, 0.98), rgba(245, 236, 224, 0.96));
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .resource-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
     .footer {
@@ -525,9 +575,12 @@
 
     @media (max-width: 1080px) {
       .hero-grid,
-      .feature-grid,
-      .method-layout,
-      .results-grid {
+      .two-column,
+      .method-grid,
+      .results-grid,
+      .viz-grid,
+      .resource-grid,
+      .why-grid {
         grid-template-columns: 1fr;
       }
 
@@ -553,7 +606,7 @@
       }
 
       .authors,
-      .stat-row {
+      .fact-grid {
         grid-template-columns: 1fr;
       }
 
@@ -582,21 +635,23 @@
         gap: 26px;
       }
 
-      .hero h1 {
+      h1 {
         max-width: none;
-        font-size: clamp(2.2rem, 11vw, 3.4rem);
+        font-size: clamp(2.2rem, 11vw, 3.6rem);
       }
 
       h2 {
-        font-size: clamp(1.8rem, 8vw, 2.4rem);
+        font-size: clamp(1.85rem, 8vw, 2.45rem);
       }
 
+      .panel,
       .spotlight,
       .method-card,
-      .method-side,
+      .sidebar-card,
       .result-card,
-      .figure-card {
-        padding: 18px;
+      .viz-card,
+      .resource-panel {
+        padding: 20px;
       }
 
       .button {
@@ -613,31 +668,36 @@
         <span>Regularized Latent Dynamics Prediction</span>
       </a>
       <div class="nav-links">
-        <a href="#overview">Overview</a>
-        <a href="#insight">Why RLDP</a>
-        <a href="#method">How It Works</a>
+        <a href="#hero">Hero</a>
+        <a href="#motivation">Motivation</a>
+        <a href="#insight">Core Insight</a>
+        <a href="#method">Method</a>
+        <a href="#why-rldp">Why RLDP</a>
         <a href="#results">Results</a>
-        <a href="https://arxiv.org/abs/2603.15857">Paper</a>
+        <a href="#visualizations">Visualizations</a>
+        <a href="#world-modeling">World Modeling</a>
+        <a href="#resources">Resources</a>
       </div>
     </div>
   </nav>
 
   <main id="top">
-    <div class="wrap hero" id="overview">
+    <div class="wrap hero" id="hero">
       <section class="hero-shell">
         <div class="hero-grid">
           <div>
             <span class="eyebrow">Behavior Foundation Models • Zero-Shot RL</span>
-            <h1>Regularized Latent Dynamics Prediction is a Strong Baseline for Behavioral Foundation Models</h1>
+            <h1>Regularized Latent Dynamics Prediction</h1>
             <p class="hero-lead">
-              RLDP asks a simple question with surprisingly strong consequences: can next-state prediction alone
-              produce representations useful for zero-shot reinforcement learning? The answer is yes, if we prevent
-              the representation from collapsing and make diversity a first-class objective.
+              RLDP is a simple representation learning baseline for zero-shot reinforcement learning. It predicts
+              latent future state evolution and uses orthogonality regularization to prevent mild feature collapse,
+              yielding features that are both predictive and broadly useful downstream.
             </p>
 
             <div class="hero-actions">
-              <a class="button primary" href="https://arxiv.org/abs/2603.15857">Read the Paper</a>
-              <a class="button secondary" href="#method">See How It Works</a>
+              <a class="button primary" href="https://arxiv.org/abs/2603.15857">Read Paper</a>
+              <a class="button secondary" href="#method">Explore Method</a>
+              <a class="button secondary" href="#results">See Results</a>
             </div>
 
             <div class="hero-meta">
@@ -658,33 +718,82 @@
               </div>
 
               <p class="note">
-                This page is designed as an informal project story for the paper. For the complete technical treatment,
-                please refer to the manuscript.
+                This page retells the main ideas of RLDP as a visual project story. For the full technical details,
+                refer to the paper.
               </p>
             </div>
           </div>
 
           <div class="hero-visual">
             <div class="hero-card">
-              <img src="rldp_site_assets/method_gif.gif" alt="Overview animation of RLDP" />
-              <div class="hero-card-caption">Figure 1. RLDP learns a policy-independent representation by predicting latent future state evolution while explicitly regularizing for diversity.</div>
+              <img src="rldp_site_assets/method_gif.gif" alt="Overview animation of the RLDP method" />
+              <div class="hero-card-caption">
+                Figure 1. RLDP learns policy-independent representations through latent dynamics prediction, then
+                regularizes them so the embedding space stays diverse and useful.
+              </div>
             </div>
 
-            <div class="stat-row">
-              <div class="stat-card">
-                <div class="stat-value">Simple</div>
-                <div class="stat-label">Dynamics prediction stays at the core of the method.</div>
+            <div class="fact-grid">
+              <div class="fact-card">
+                <div class="fact-number">Simple</div>
+                <div class="fact-label">A clean latent prediction objective at the center of the method.</div>
               </div>
-              <div class="stat-card">
-                <div class="stat-value">Diverse</div>
-                <div class="stat-label">Regularization prevents mild collapse in the learned features.</div>
+              <div class="fact-card">
+                <div class="fact-number">Stable</div>
+                <div class="fact-label">Orthogonality regularization counteracts mild representation collapse.</div>
               </div>
-              <div class="stat-card">
-                <div class="stat-value">Strong</div>
-                <div class="stat-label">Competitive zero-shot performance across offline and online settings.</div>
+              <div class="fact-card">
+                <div class="fact-number">Strong</div>
+                <div class="fact-label">Competitive in offline and online zero-shot RL, especially with low coverage.</div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="wrap section-block" id="motivation">
+      <section>
+        <div class="section-header">
+          <div>
+            <span class="section-kicker">Motivation</span>
+            <h2>How far can a simple predictive objective really go?</h2>
+          </div>
+          <p class="section-summary">
+            Zero-shot RL needs representations that are not tied to one task or one reward. RLDP studies whether
+            latent next-state prediction, one of the simplest temporal learning signals available, can already serve
+            as a strong foundation model objective.
+          </p>
+        </div>
+
+        <div class="two-column">
+          <article class="card spotlight">
+            <h3>A strong baseline is valuable</h3>
+            <p>
+              Rather than starting from a heavy objective, RLDP starts with a minimal one and asks what is missing.
+              That framing makes the method useful scientifically: it reveals which ingredients are essential for
+              zero-shot performance and which are not.
+            </p>
+            <div class="bullet-list">
+              <div class="bullet-item"><div>Predictive features should encode how states evolve over time, not just how they look.</div></div>
+              <div class="bullet-item"><div>Those same features must remain broad enough to support many downstream rewards.</div></div>
+              <div class="bullet-item"><div>A simple method that performs well is easier to interpret, compare, and build upon.</div></div>
+            </div>
+          </article>
+
+          <article class="card panel">
+            <h3>The central question</h3>
+            <p>
+              Does latent next-state prediction produce state features that enable performant zero-shot reinforcement
+              learning? RLDP shows that the answer is almost yes by default, and clearly yes once mild collapse is
+              controlled with the right regularization.
+            </p>
+            <div class="mini-metrics">
+              <div><strong>Predictive</strong> Features track future state evolution.</div>
+              <div><strong>Transferable</strong> Frozen representations remain useful across tasks.</div>
+              <div><strong>Data-efficient</strong> The gains are especially visible when coverage is limited.</div>
+            </div>
+          </article>
         </div>
       </section>
     </div>
@@ -693,56 +802,37 @@
       <section>
         <div class="section-header">
           <div>
-            <span class="section-kicker">Core insight</span>
-            <h2>Prediction alone is not enough. Predictive and diverse is the real target.</h2>
+            <span class="section-kicker">Core Insight</span>
+            <h2>Naive latent prediction quietly drives features toward similarity.</h2>
           </div>
           <p class="section-summary">
-            RLDP shows that naive latent dynamics prediction can drift toward a mild form of feature collapse.
-            The regularized variant keeps the representation expressive, preserving structure that can support
-            a broader family of downstream rewards without losing predictive power.
+            The issue is not that latent dynamics prediction fails. The issue is that, in its naive form, it can
+            produce a mild form of feature collapse. RLDP addresses that failure mode directly with orthogonality
+            regularization.
           </p>
         </div>
 
-        <div class="feature-grid">
-          <article class="card spotlight">
-            <h3>Why the baseline matters</h3>
-            <p>
-              Strong behavior foundation models do not always require elaborate objectives. RLDP intentionally keeps the
-              learning signal simple, then asks what minimal ingredient is needed to make it robust for zero-shot RL.
-            </p>
-            <div class="bullet-list">
-              <div class="bullet-item"><div>Naive next-state prediction can over-concentrate features and reduce coverage of useful directions in representation space.</div></div>
-              <div class="bullet-item"><div>A diversity regularizer counteracts collapse while still keeping features predictive of future state evolution.</div></div>
-              <div class="bullet-item"><div>The resulting representation transfers well across benchmark settings, including lower-coverage offline datasets.</div></div>
-            </div>
-          </article>
-
-          <figure class="card figure-card">
+        <div class="two-column">
+          <figure class="card panel">
             <div class="figure-frame">
-              <img src="rldp_site_assets/cosine_collapse.png" alt="Cosine similarity visualization showing feature collapse with naive dynamics prediction" />
+              <img src="rldp_site_assets/cosine_collapse.png" alt="Visualization of feature similarity collapse under naive latent dynamics prediction" />
             </div>
-            <figcaption>Naive latent dynamics prediction tends to cluster features too aggressively, producing a mild but measurable collapse.</figcaption>
-          </figure>
-        </div>
-
-        <div class="feature-grid" style="margin-top: 22px;">
-          <figure class="card figure-card">
-            <div class="figure-frame">
-              <img src="rldp_site_assets/cosine_improvement.png" alt="Cosine similarity visualization showing improved feature diversity with RLDP regularization" />
-            </div>
-            <figcaption>With regularization, the representation stays structured and diverse enough to support richer downstream reward families.</figcaption>
+            <figcaption>
+              Naive latent dynamics prediction leads to overly similar features, reducing the diversity needed for
+              broad zero-shot reuse.
+            </figcaption>
           </figure>
 
           <article class="card spotlight">
-            <h3>What changes with regularization</h3>
+            <h3>What is collapsing?</h3>
             <p>
-              The regularizer does not replace the predictive objective. Instead, it reshapes the geometry of the learned
-              space so RLDP can encode futures that remain both discriminative and reusable for zero-shot control.
+              The representation still predicts something useful, but too many directions in feature space start to
+              resemble each other. That weakens the representation as a general-purpose substrate for many possible rewards.
             </p>
-            <div class="bullet-list">
-              <div class="bullet-item"><div>Future evolution is still encoded through dynamics prediction in latent space.</div></div>
-              <div class="bullet-item"><div>Representation diversity improves the usefulness of those features for many rewards, not just one narrow objective.</div></div>
-              <div class="bullet-item"><div>The method remains simple enough to serve as a clean, credible baseline for behavioral foundation models.</div></div>
+            <div class="check-list">
+              <div class="check-item"><div>Prediction quality alone does not guarantee a well-shaped representation.</div></div>
+              <div class="check-item"><div>Feature similarity is a geometric warning sign for downstream expressiveness.</div></div>
+              <div class="check-item"><div>Orthogonality regularization preserves diversity without abandoning the predictive signal.</div></div>
             </div>
           </article>
         </div>
@@ -754,49 +844,68 @@
         <div class="section-header">
           <div>
             <span class="section-kicker">Method</span>
-            <h2>How RLDP works</h2>
+            <h2>Predict the future, regularize the geometry.</h2>
           </div>
           <p class="section-summary">
-            The representation is learned from offline interaction data through latent next-state prediction, then improved
-            with a regularizer that explicitly protects the diversity of the embedding space.
+            RLDP learns representations from offline interaction data by predicting latent next states. An
+            orthogonality regularizer then keeps the learned features from collapsing into overly similar directions.
           </p>
         </div>
 
-        <div class="method-layout">
+        <div class="method-grid">
           <article class="card method-card">
-            <h3>Overview of the learning pipeline</h3>
+            <h3>Overview of RLDP</h3>
             <p>
-              RLDP uses a compact idea: encode observations, predict how those latent states evolve, and regularize the
-              geometry of the features so they remain broadly useful for reward-conditioned downstream control.
+              The method is intentionally compact: encode observations, model future latent evolution, and shape the
+              representation space so the resulting features stay diverse enough for broad zero-shot control.
             </p>
-            <figure>
+            <figure style="margin: 22px 0 0;">
               <div class="figure-frame">
-                <img src="rldp_site_assets/method_gif.gif" alt="Animated method overview for RLDP" />
+                <img src="rldp_site_assets/method_gif.gif" alt="Animated overview of the RLDP pipeline" />
               </div>
-              <figcaption>Figure 1. RLDP combines latent dynamics prediction with a representation diversity regularizer.</figcaption>
+              <figcaption>Figure 1. RLDP combines latent dynamics prediction with orthogonality-based regularization.</figcaption>
             </figure>
           </article>
 
-          <aside class="card method-side">
-            <h3>Design principles</h3>
-            <p>
-              The method is intentionally lightweight, making it easier to interpret what each ingredient contributes.
-            </p>
+          <aside class="card sidebar-card">
+            <h3>Three ingredients</h3>
+            <p>RLDP stays simple enough to interpret while still capturing the ingredients that matter most.</p>
             <ul class="signal-list">
-              <li>
-                <strong>Predict future state evolution</strong>
-                Learn a representation grounded in how the environment changes over time.
-              </li>
-              <li>
-                <strong>Guard against collapse</strong>
-                Encourage the embedding space to retain multiple informative directions.
-              </li>
-              <li>
-                <strong>Transfer without task labels</strong>
-                Evaluate the frozen representation through zero-shot reinforcement learning downstream.
-              </li>
+              <li><strong>Latent prediction</strong> Learn a state representation grounded in temporal evolution.</li>
+              <li><strong>Orthogonality regularization</strong> Prevent mild collapse by preserving informative directions in feature space.</li>
+              <li><strong>Frozen downstream use</strong> Evaluate the representation through zero-shot reinforcement learning tasks.</li>
             </ul>
           </aside>
+        </div>
+      </section>
+    </div>
+
+    <div class="wrap section-block" id="why-rldp">
+      <section>
+        <div class="section-header">
+          <div>
+            <span class="section-kicker">Why RLDP</span>
+            <h2>A baseline that is easy to trust and hard to ignore.</h2>
+          </div>
+          <p class="section-summary">
+            RLDP is attractive not just because it works, but because it works with an objective that is simple,
+            readable, and scientifically revealing.
+          </p>
+        </div>
+
+        <div class="why-grid">
+          <article class="reason-card">
+            <h3>Simple objective</h3>
+            <p>Latent dynamics prediction is a natural temporal signal and avoids unnecessary objective complexity.</p>
+          </article>
+          <article class="reason-card">
+            <h3>Better representation geometry</h3>
+            <p>Orthogonality regularization protects feature diversity, which improves transfer to a broad family of rewards.</p>
+          </article>
+          <article class="reason-card">
+            <h3>Strong low-coverage behavior</h3>
+            <p>RLDP remains particularly effective when offline datasets become less forgiving and coverage drops.</p>
+          </article>
         </div>
       </section>
     </div>
@@ -806,25 +915,24 @@
         <div class="section-header">
           <div>
             <span class="section-kicker">Results</span>
-            <h2>Competitive performance across the settings that matter</h2>
+            <h2>Competitive across offline, online, and low-coverage settings.</h2>
           </div>
           <p class="section-summary">
-            RLDP is evaluated in offline zero-shot RL, online zero-shot RL, and low-coverage dataset settings.
-            Across these experiments, the message is consistent: a simple predictive baseline becomes strong when its
-            representation geometry is handled carefully.
+            Across benchmarks, RLDP consistently shows that once mild collapse is handled, a simple predictive
+            representation objective becomes a strong baseline for behavioral foundation models.
           </p>
         </div>
 
         <div class="results-grid">
           <article class="card result-card">
             <div class="result-media">
-              <img src="rldp_site_assets/results-offlinezeroshotRL.png" alt="Offline zero-shot RL benchmark results" />
+              <img src="rldp_site_assets/results-offlinezeroshotRL.png" alt="Offline zero-shot RL benchmark plot" />
             </div>
             <div class="result-copy">
               <h3>Offline Zero-Shot RL</h3>
               <p>
-                On DeepMind Control Suite tasks with ExoRL data, RLDP remains competitive with state-of-the-art
-                representation learning baselines while keeping the training objective simple and interpretable.
+                On DeepMind Control Suite tasks with ExoRL datasets, RLDP is competitive with strong prior
+                representation learning methods while maintaining a much simpler training objective.
               </p>
               <div class="result-caption">Benchmarks include Pointmass, Cheetah, Walker, and Quadruped.</div>
             </div>
@@ -832,37 +940,156 @@
 
           <article class="card result-card">
             <div class="result-media">
-              <img src="rldp_site_assets/humanoid_violin_1.png" alt="Online zero-shot RL results in SMPL humanoid tasks" />
+              <img src="rldp_site_assets/humanoid_violin_1.png" alt="Online zero-shot RL plot in SMPL humanoid" />
             </div>
             <div class="result-copy">
               <h3>Online Zero-Shot RL</h3>
               <p>
-                In the high-dimensional SMPL humanoid setting, frozen RLDP representations enable strong multi-task policy
-                learning when the agent is later allowed online interaction.
+                In the high-dimensional SMPL humanoid setting, frozen RLDP representations support competitive
+                multi-task policy learning once the agent is allowed online interaction.
               </p>
-              <div class="result-caption">Evaluation spans 45 tasks, with the violin plot showing RLDP is frequently competitive or better.</div>
+              <div class="result-caption">The violin plot shows RLDP is often competitive and sometimes better than baseline methods.</div>
             </div>
           </article>
 
           <article class="card result-card">
             <div class="result-media">
-              <img src="rldp_site_assets/d4rl_violin_1.png" alt="Low-coverage dataset results in D4RL benchmark" />
+              <img src="rldp_site_assets/d4rl_violin_1.png" alt="Low-coverage D4RL benchmark plot" />
             </div>
             <div class="result-copy">
               <h3>Low-Coverage Datasets</h3>
               <p>
-                RLDP stays effective when the offline data distribution becomes less forgiving, outperforming baseline
-                methods on many D4RL MuJoCo tasks where representation quality is especially sensitive to coverage.
+                RLDP is especially compelling when offline data coverage is limited, outperforming baseline methods
+                on many D4RL MuJoCo tasks where representation quality becomes especially brittle.
               </p>
-              <div class="result-caption">The mass of the violin above zero indicates broad advantages over comparison methods.</div>
+              <div class="result-caption">A large fraction of the violin mass above zero indicates broad gains over comparison methods.</div>
             </div>
           </article>
         </div>
       </section>
     </div>
 
+    <div class="wrap section-block" id="visualizations">
+      <section>
+        <div class="section-header">
+          <div>
+            <span class="section-kicker">Visualizations</span>
+            <h2>Seeing the geometry change makes the story much clearer.</h2>
+          </div>
+          <p class="section-summary">
+            The contrast between collapse and regularized diversity is one of the clearest takeaways of the project.
+            These figures make the representational effect of RLDP visually tangible.
+          </p>
+        </div>
+
+        <div class="viz-grid">
+          <article class="card viz-card">
+            <div class="figure-frame">
+              <img src="rldp_site_assets/cosine_collapse.png" alt="Feature collapse cosine visualization" />
+            </div>
+            <div>
+              <h3>Without regularization</h3>
+              <p>
+                Features become too similar, limiting the representation's ability to express many downstream rewards.
+              </p>
+            </div>
+          </article>
+
+          <article class="card viz-card">
+            <div class="figure-frame">
+              <img src="rldp_site_assets/cosine_improvement.png" alt="Improved feature diversity under RLDP regularization" />
+            </div>
+            <div>
+              <h3>With RLDP regularization</h3>
+              <p>
+                The feature space stays more diverse while remaining predictive of future state evolution, which is the
+                balance zero-shot RL needs.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <div class="wrap section-block" id="world-modeling">
+      <section>
+        <div class="section-header">
+          <div>
+            <span class="section-kicker">Toward World Modeling</span>
+            <h2>RLDP points toward a broader lesson for predictive models.</h2>
+          </div>
+          <p class="section-summary">
+            Predictive objectives are powerful, but representation geometry matters. RLDP suggests that future world
+            models and behavior foundation models may benefit from simple predictive cores paired with explicit controls
+            on collapse and diversity.
+          </p>
+        </div>
+
+        <div class="two-column">
+          <article class="card panel">
+            <h3>Why this matters beyond one benchmark</h3>
+            <p>
+              The project highlights a clean design principle: predictive learning should not only model what happens
+              next, but also preserve the structure needed for reuse. That makes RLDP interesting as more than a
+              baseline; it is a hint about how to scale predictive representation learning responsibly.
+            </p>
+            <div class="bullet-list">
+              <div class="bullet-item"><div>Temporal prediction can be a strong backbone for foundation models in control.</div></div>
+              <div class="bullet-item"><div>Regularization of representation geometry may be a key companion objective.</div></div>
+              <div class="bullet-item"><div>Low-coverage robustness is especially relevant for realistic offline data regimes.</div></div>
+            </div>
+          </article>
+
+          <article class="card panel">
+            <h3>The take-home message</h3>
+            <p>
+              RLDP is compelling precisely because it does not rely on a complicated stack of ingredients. It shows that
+              a well-regularized predictive objective can already serve as a credible, strong foundation for zero-shot RL.
+            </p>
+            <div class="mini-metrics">
+              <div><strong>Predictive enough</strong> to encode state evolution.</div>
+              <div><strong>Diverse enough</strong> to support many rewards.</div>
+              <div><strong>Simple enough</strong> to be a meaningful baseline.</div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <div class="wrap section-block" id="resources">
+      <section class="resource-panel">
+        <div class="resource-grid">
+          <div>
+            <span class="section-kicker">Resources</span>
+            <h2>Read, cite, and build on RLDP.</h2>
+            <p>
+              Use the paper for full experimental and technical detail, and use this page as a compact visual summary
+              of the key ideas: latent dynamics prediction, mild collapse, orthogonality regularization, and strong
+              zero-shot performance.
+            </p>
+            <div class="resource-buttons">
+              <a class="button primary" href="https://arxiv.org/abs/2603.15857">Paper</a>
+              <a class="button secondary" href="#hero">Project Overview</a>
+              <a class="button secondary" href="#results">Results Summary</a>
+            </div>
+            <div class="resource-note">
+              Additional artifacts such as slides, video, or code can be linked here when available.
+            </div>
+          </div>
+
+          <div class="card panel">
+            <h3>Key message</h3>
+            <p>
+              RLDP shows that a simple latent dynamics objective, when paired with orthogonality regularization,
+              becomes a polished and credible baseline for behavioral foundation models in zero-shot reinforcement learning.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <div class="wrap footer">
-      <div>RLDP highlights how a carefully regularized predictive objective can become a reliable baseline for zero-shot reinforcement learning.</div>
+      <div>RLDP reframes a simple predictive baseline as a strong, elegant foundation for zero-shot reinforcement learning.</div>
     </div>
   </main>
 </body>
